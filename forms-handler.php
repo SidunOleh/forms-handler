@@ -41,7 +41,7 @@ Handler::addRule('email', function (string $field, array $data) {
     return filter_var($data[$field], FILTER_VALIDATE_EMAIL);
 });
 
-Handler::addRule('phone', function (string $field, array $data) {
+Handler::addRule('us-phone', function (string $field, array $data) {
     return preg_match('/^\(\d{3}\) \d{3}\-\d{4}$/', $data[$field]);
 });
 
