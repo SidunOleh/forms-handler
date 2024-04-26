@@ -54,11 +54,11 @@ class Handler
             $this->response(false);
         }
 
-        do_action('forms_handlers_before_send', $this->action, $validated, $input, $this->conf);
+        do_action('forms_handlers_before_send', $this->action, $validated, $this->conf);
 
         $sent = $this->send($validated);
 
-        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $input, $this->conf);
+        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
 
         $this->response($sent);
     }

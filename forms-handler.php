@@ -122,7 +122,6 @@ add_action('wp_head', function () {
 add_action('forms_handlers_before_send', function (
     string $action, 
     array $validated,
-    array $input
 ) {
     if (! get_forms_settings('enable_recaptcha')) {
         return;
@@ -133,7 +132,7 @@ add_action('forms_handlers_before_send', function (
         get_forms_settings('recaptcha_secret_key')
     );
 
-    $code = $input['recaptcha_response'] ?? null;
+    $code = $_POST['recaptcha_response'] ?? null;
     if (
         ! $code or 
         ! $recaptcha->verify($code)
@@ -141,7 +140,7 @@ add_action('forms_handlers_before_send', function (
         wp_send_json(['status' => false,]);
         wp_die();
     }
-}, 10, 3);
+}, 10, 2);
 
 /**
  * Save form data to db
@@ -149,8 +148,7 @@ add_action('forms_handlers_before_send', function (
 add_action('forms_handlers_after_send', function (
     string $action,
     bool $sent,  
-    array $validated, 
-    array $input, 
+    array $validated,
     array $conf
 ) {
     if (! $conf['persist'] ?? false) {
@@ -158,7 +156,7 @@ add_action('forms_handlers_after_send', function (
     }
 
     FormsData::save($action, $sent, $validated);
-}, 10, 5);
+}, 10, 4);
 
 /**
  * Add menu page
