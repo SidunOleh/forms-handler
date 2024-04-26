@@ -1,0 +1,14 @@
+{
+    "name": "sova/forms-handler",
+    "autoload": {
+        "psr-4": {
+            "FormsHandler\\": "src/"
+        },
+        "files": ["src/helpers.php"]
+    },
+    "authors": [{
+        "name": "Oleh Sidun",
+        "email": "sidunoleh@gmail.com"
+    }],
+    "require": {}
+}
