@@ -141,7 +141,7 @@ add_action('forms_handlers_before_send', function (
         wp_send_json(['status' => false,]);
         wp_die();
     }
-}, 10, 2);
+}, 10, 3);
 
 /**
  * Save form data to db
@@ -158,7 +158,7 @@ add_action('forms_handlers_after_send', function (
     }
 
     FormsData::save($action, $sent, $validated);
-}, 10, 4);
+}, 10, 5);
 
 /**
  * Add menu page
