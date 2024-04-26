@@ -121,7 +121,8 @@ add_action('wp_head', function () {
  */
 add_action('forms_handlers_before_send', function (
     string $action, 
-    array $input,
+    array $validated,
+    array $input
 ) {
     if (! get_forms_settings('enable_recaptcha')) {
         return;
@@ -146,9 +147,10 @@ add_action('forms_handlers_before_send', function (
  * Save form data to db
  */
 add_action('forms_handlers_after_send', function (
-    string $action, 
+    string $action,
+    bool $sent,  
     array $validated, 
-    bool $sent, 
+    array $input, 
     array $conf
 ) {
     if (! $conf['persist'] ?? false) {

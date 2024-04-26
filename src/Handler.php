@@ -49,16 +49,16 @@ class Handler
     {
         $input = $_POST;
 
-        do_action('forms_handlers_before_send', $this->action, $input, $this->conf);
-
         $validated = $this->validate($input);
         if ($validated === false) {
             $this->response(false);
         }
 
+        do_action('forms_handlers_before_send', $this->action, $validated, $input, $this->conf);
+
         $sent = $this->send($validated);
 
-        do_action('forms_handlers_after_send', $this->action, $validated, $sent, $this->conf);
+        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $input, $this->conf);
 
         $this->response($sent);
     }
