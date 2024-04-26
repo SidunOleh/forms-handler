@@ -110,10 +110,7 @@ add_action('wp_head', function () {
     .grecaptcha-badge:not(.show) {
         visibility: hidden !important;
         right: -300px !important;
-        transition: all 0.5s linear; 
-    }
-    .grecaptcha-badge.show {
-        visibility: visible !important;
+        transition: all 0.5s linear !important; 
     }
     </style>
     <?php 
