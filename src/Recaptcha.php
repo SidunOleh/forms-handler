@@ -10,8 +10,6 @@ class Recaptcha
 
     private string $secretKey;
 
-    private string $verifyUri;
-
     public function __construct(
         string $siteKey,
         string $secretKey
@@ -19,12 +17,11 @@ class Recaptcha
     {
         $this->siteKey = $siteKey;
         $this->secretKey = $secretKey;
-        $this->verifyUri = 'https://www.google.com/recaptcha/api/siteverify';
     }
 
     public function verify(string $code): bool
     {
-        $response = wp_remote_post($this->verifyUri, [
+        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', [
             'body' => [
                 'secret' => $this->secretKey,
                 'response' => $code,
