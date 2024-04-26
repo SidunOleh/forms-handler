@@ -68,6 +68,58 @@ register_activation_hook(__FILE__, function () {
 });
 
 /**
+ * reCAPTCHA
+ */
+add_action('wp_head', function () {
+    if (! get_forms_settings('enable_recaptcha')) {
+        return;
+    }
+
+    $siteKey = get_forms_settings('recaptcha_site_key');
+    ?>
+    <script src="https://www.google.com/recaptcha/api.js?render=<?php echo $siteKey ?>">
+    </script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        grecaptcha.ready(() => {
+            grecaptcha.execute('<?php echo $siteKey ?>', {
+                action:'validate_captcha'
+            }).then(token => {
+                const recaptchaInput = document.createElement('input')
+                recaptchaInput.type = 'hidden'
+                recaptchaInput.name = 'recaptcha_response'
+                recaptchaInput.value = token
+                
+                const forms = document.querySelectorAll('form')
+                forms.forEach(form => form.appendChild(recaptchaInput.cloneNode()))
+            }).catch(err => console.log(err))
+        })
+
+        const inputs = document.querySelectorAll('input')
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                document.querySelector('.grecaptcha-badge')
+                    .classList
+                    .add('show')
+            })
+        })
+    })
+    </script>
+
+    <style>
+    .grecaptcha-badge:not(.show) {
+        visibility: hidden !important;
+        right: -300px !important;
+        transition: all 0.5s linear; 
+    }
+    .grecaptcha-badge.show {
+        visibility: visible !important;
+    }
+    </style>
+    <?php 
+});
+
+/**
  * Check reCAPTCHA
  */
 add_action('forms_handlers_before_send', function (
