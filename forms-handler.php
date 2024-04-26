@@ -119,10 +119,7 @@ add_action('wp_head', function () {
 /**
  * Check reCAPTCHA
  */
-add_action('forms_handlers_before_send', function (
-    string $action, 
-    array $validated,
-) {
+add_action('forms_handlers_before_send', function () {
     if (! get_forms_settings('enable_recaptcha')) {
         return;
     }
@@ -140,7 +137,7 @@ add_action('forms_handlers_before_send', function (
         wp_send_json(['status' => false,]);
         wp_die();
     }
-}, 10, 2);
+}, 10);
 
 /**
  * Save form data to db
