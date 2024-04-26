@@ -83,13 +83,13 @@ add_action('wp_head', function () {
     document.addEventListener('DOMContentLoaded', () => {
         grecaptcha.ready(() => {
             grecaptcha.execute('<?php echo $siteKey ?>', {
-                action:'validate_captcha'
+                action:'validate_captcha',
             }).then(token => {
                 const recaptchaInput = document.createElement('input')
                 recaptchaInput.type = 'hidden'
                 recaptchaInput.name = 'recaptcha_response'
                 recaptchaInput.value = token
-                
+
                 const forms = document.querySelectorAll('form')
                 forms.forEach(form => form.appendChild(recaptchaInput.cloneNode()))
             }).catch(err => console.log(err))
