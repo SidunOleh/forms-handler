@@ -137,7 +137,7 @@ add_action('forms_handlers_before_send', function (
         ! $code or 
         ! $recaptcha->verify($code)
     ) {
-        wp_send_json(['success' => false,]);
+        wp_send_json(['status' => false,]);
         wp_die();
     }
 }, 10, 2);

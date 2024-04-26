@@ -125,9 +125,9 @@ class Handler
         return $msg;
     }
 
-    private function response(bool $success): never
+    private function response(bool $status): never
     {
-        wp_send_json(['success' => $success,]);
+        wp_send_json(['status' => $status,]);
         wp_die();
     }
 
