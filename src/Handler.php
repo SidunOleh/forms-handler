@@ -47,9 +47,7 @@ class Handler
 
     public function handle(): never
     {
-        $input = $this->getInput();
-
-        $validated = $this->validate($input);
+        $validated = $this->validate($this->getInput());
 
         if ($validated === false) {
             $this->response(false);
