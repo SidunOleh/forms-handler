@@ -82,7 +82,7 @@ add_action('wp_head', function () {
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        grecaptcha.ready(passRecaptcha)
+        grecaptcha.ready(sendRecaptcha)
 
         const inputs = document.querySelectorAll('input')
         inputs.forEach(input => {
@@ -94,7 +94,7 @@ add_action('wp_head', function () {
         })
     })
 
-    function passRecaptcha() {
+    function sendRecaptcha() {
         grecaptcha.execute('<?php echo $siteKey ?>', {
             action:'validate_captcha',
         }).then(token => {
