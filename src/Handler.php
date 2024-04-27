@@ -70,6 +70,10 @@ class Handler
                 continue;
             } 
 
+            if ($value === []) {
+                continue;
+            }
+
             $input[$key] = $value;
         }
 
