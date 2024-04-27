@@ -47,9 +47,10 @@ class Handler
 
     public function handle(): never
     {
-        $input = $_POST;
+        $input = $this->getInput();
 
         $validated = $this->validate($input);
+
         if ($validated === false) {
             $this->response(false);
         }
@@ -61,6 +62,20 @@ class Handler
         do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
 
         $this->response($sent);
+    }
+
+    private function getInput(): array
+    {
+        $input = [];
+        foreach ($_POST as $key => $value) {
+            if ($value === '') {
+                continue;
+            } 
+
+            $input[$key] = $value;
+        }
+
+        return $input;
     }
 
     private function validate(array $data): array|false
