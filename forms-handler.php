@@ -204,7 +204,7 @@ add_action('init', function () {
 /**
  * Get forms data
  */
-add_action('wp_ajax_get_forms_data', function () {;
+add_action('wp_ajax_get_forms_data', function () {
     if (
         ! $user = wp_get_current_user() or 
         ! $user->has_cap('forms_edit')
