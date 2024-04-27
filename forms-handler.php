@@ -9,6 +9,7 @@
 use FormsHandler\FormsData;
 use FormsHandler\Handler;
 use FormsHandler\Recaptcha;
+use function FormsHandler\get_forms_settings;
 
 defined('ABSPATH') or die;
 
