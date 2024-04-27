@@ -46,6 +46,10 @@ Handler::addRule('us-phone', function (string $field, array $data) {
     return preg_match('/^\(\d{3}\) \d{3}\-\d{4}$/', $data[$field]);
 });
 
+Handler::addRule('array', function (string $field, array $data) {
+    return is_array($data[$field]);
+});
+
 /**
  * Create forms data table
  */
