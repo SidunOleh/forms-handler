@@ -65,7 +65,7 @@ class Handler
     private function getInput(): array
     {
         $input = [];
-        foreach ($_POST as $key => $value) {
+        foreach ($_POST as $name => $value) {
             if ($value === '') {
                 continue;
             } 
@@ -74,7 +74,7 @@ class Handler
                 continue;
             }
 
-            $input[$key] = $value;
+            $input[$name] = $value;
         }
 
         return $input;
