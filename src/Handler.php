@@ -78,8 +78,6 @@ class Handler
         $validation = $validator->make($_POST + $_FILES, $this->rules);
         $validation->validate();
 
-        var_dump($validation->getValidData());
-
         if ($validation->fails()) {
             return false;
         } else {
