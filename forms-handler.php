@@ -76,7 +76,7 @@ add_action('wp_head', function () {
     document.addEventListener('DOMContentLoaded', () => {
         grecaptcha.ready(validateCaptcha)
 
-        const inputs = document.querySelectorAll('form.recaptcha input')
+        const inputs = document.querySelectorAll('form.recaptcha input, form.recaptcha textarea')
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
                 document.querySelector('.grecaptcha-badge')
