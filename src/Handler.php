@@ -49,7 +49,7 @@ class Handler
         $validator = new Validator;
         $validation = $validator->make($_POST + $_FILES, $this->rules);
         $validation->validate();
-        
+
         if ($validation->fails()) {
             $this->response(false);
         }
@@ -69,11 +69,11 @@ class Handler
 
         $sent = $this->send($validated);
 
+        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
+
         if ($this->conf['persist'] ?? false) {
             FormsData::save($this->action, $sent, $validated);
         }
-
-        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
 
         $this->response($sent);
     }
@@ -133,6 +133,10 @@ class Handler
         );
 
         $msg = new Message($data, $msgTemplate);
+
+        if (isset($data['email'])) {
+            $this->headers[] = "Reply-To: {$data['email']} <{$data['email']}>";
+        }
 
         return $msg->send($this->to, $this->subject, $this->headers);
     }

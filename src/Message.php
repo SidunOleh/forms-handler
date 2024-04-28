@@ -22,10 +22,6 @@ class Message
         array $headers
     ): bool
     {
-        if (isset($this->data['email'])) {
-            $headers[] = "Reply-To: {$this->data['email']} <{$this->data['email']}>";
-        }
-
         return wp_mail($to, $subject, $this->readTemplate(), $headers);
     }
 
