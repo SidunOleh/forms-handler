@@ -44,6 +44,23 @@ register_activation_hook(__FILE__, function () {
 });
 
 /**
+ * Add forms_edit capability and forms_editor role
+ */
+register_activation_hook(__FILE__, function () {
+    if ($formsEditor = add_role('forms_editor', __('Forms editor'))) {
+        $formsEditor->add_cap('forms_edit');
+        $formsEditor->add_cap('read');
+    }
+
+    if (
+        $admin = get_role('administrator') and 
+        ! $admin->has_cap('forms_editor')
+    ) {
+        $admin->add_cap('forms_edit');
+    }
+});
+
+/**
  * reCAPTCHA
  */
 add_action('wp_head', function () {
@@ -121,22 +138,6 @@ add_action('admin_menu', function () {
         'forms-settings',
         fn () => require FORMS_HANDLER_ROOT . '/src/views/pages/settings.php',
     );
-});
-
-/**
- * Add forms_edit cap and forms editor role
- */
-add_action('init', function () {
-    $role = add_role('forms_editor', __('Forms editor'));
-    if ($role) {
-        $role->add_cap('forms_edit');
-        $role->add_cap('read');
-    }
-
-    $admin = get_role('administrator');
-    if (! $admin->has_cap('forms_editor')) {
-        $admin->add_cap('forms_edit');
-    }
 });
 
 /**
