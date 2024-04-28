@@ -44,7 +44,7 @@ register_activation_hook(__FILE__, function () {
 });
 
 /**
- * Add forms_edit capability and forms_editor role
+ * Add forms_manage capability and forms_manager role
  */
 register_activation_hook(__FILE__, function () {
     if ($formsEditor = add_role('forms_manager', __('Forms manager'))) {
