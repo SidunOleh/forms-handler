@@ -107,28 +107,13 @@ class Handler
     {
         foreach ($data as &$item) {
             if (isset($item['tmp_name'])) {
-                $item = $this->upload($item);
+                $item = (new UploadedFile($item))->upload();
             }
 
             if (is_array($item)) {
                 $this->uploadFiles($item);
             }
         }
-    }
-
-    private function upload(array $file): string|false
-    {
-        if ($file['error']) {
-            return false;
-        }
-
-        $uploaded = wp_handle_upload($file, ['test_form' => false,]);
-
-        if (isset($uploaded['error'])) {
-            return false;
-        }
-
-        return $uploaded['file'];
     }
 
     private function send(array $data): bool
