@@ -46,7 +46,7 @@ class Handler
 
     public function handle(): never
     {
-        if ($validated = $this->validate()) {
+        if (! $validated = $this->validate()) {
             $this->response(false);
         }
 
@@ -77,6 +77,8 @@ class Handler
         $validator = new Validator;
         $validation = $validator->make($_POST + $_FILES, $this->rules);
         $validation->validate();
+
+        var_dump($validation->getValidData());
 
         if ($validation->fails()) {
             return false;
