@@ -17,7 +17,7 @@ class Message
     }
 
     public function send(
-        string $to, 
+        string|array $to, 
         string $subject, 
         array $headers
     ): bool

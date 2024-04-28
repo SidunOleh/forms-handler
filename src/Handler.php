@@ -12,7 +12,7 @@ class Handler
 
     private array $rules;
 
-    private string $to;
+    private string|array $to;
 
     private string $subject;
 
@@ -23,7 +23,7 @@ class Handler
     public function __construct( 
         string $action, 
         array $rules, 
-        string $to = '', 
+        string|array $to = '', 
         string $subject = '',
         array $headers = [], 
         array $conf = []
@@ -135,10 +135,10 @@ class Handler
         $msg = new Message($data, $emailTemplate);
 
         if (isset($data['email'])) {
-           $headers = $this->headers + ["Reply-To: {$data['email']} <{$data['email']}>"];
+           array_unshift($this->headers, "Reply-To: {$data['email']} <{$data['email']}>");
         }
 
-        return $msg->send($this->to, $this->subject, $headers);
+        return $msg->send($this->to, $this->subject, $this->headers);
     }
 
     private function response(bool $status): never
