@@ -79,16 +79,14 @@ add_action('wp_head', function () {
         const inputs = document.querySelectorAll('form.recaptcha input, form.recaptcha textarea')
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
-                document.querySelector('.grecaptcha-badge')
-                    .classList
-                    .add('show')
+                document.querySelector('.grecaptcha-badge').classList.add('show')
             })
         })
     })
 
     function validateCaptcha() {
         grecaptcha.execute('<?php echo $siteKey ?>', {
-            action:'validate_captcha',
+            action: 'validate_captcha',
         }).then(token => {
             const forms = document.querySelectorAll('form.recaptcha')
             forms.forEach(form => {
