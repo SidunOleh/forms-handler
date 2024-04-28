@@ -32,8 +32,8 @@ class Recaptcha
             return false;
         }
 
-        $data = json_decode($response['body']);
+        $data = json_decode($response['body'], true);
 
-        return $data->success;
+        return $data['success'];
     }
 }
