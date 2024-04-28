@@ -46,19 +46,13 @@ class Handler
 
     public function handle(): never
     {
-        $validator = new Validator;
-        $validation = $validator->make($_POST + $_FILES, $this->rules);
-        $validation->validate();
-
-        if ($validation->fails()) {
+        if ($validated = $this->validate()) {
             $this->response(false);
         }
 
-        $validated = $validation->getValidData();
-
         if (
             get_forms_settings('enable_recaptcha') and
-            ! $this->checkRecaptcha()
+            ! $this->verifyRecaptcha()
         ) {
             $this->response(false);
         }
@@ -78,7 +72,20 @@ class Handler
         $this->response($sent);
     }
 
-    private function checkRecaptcha(): bool
+    private function validate(): array|false
+    {
+        $validator = new Validator;
+        $validation = $validator->make($_POST + $_FILES, $this->rules);
+        $validation->validate();
+
+        if ($validation->fails()) {
+            return false;
+        } else {
+            return $validation->getValidData();
+        }
+    }
+
+    private function verifyRecaptcha(): bool
     {
         $recaptcha = new Recaptcha(
             get_forms_settings('recaptcha_site_key'),
