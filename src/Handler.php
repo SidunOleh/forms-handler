@@ -31,7 +31,9 @@ class Handler
     {
         $this->action = $action;
         $this->rules = $rules;
-        $this->to = $to ?: get_option('admin_email');
+        $this->to = $to ?: 
+            get_forms_settings('default_email') ?: 
+            get_option('admin_email');
         $this->subject = $subject ?: get_bloginfo('name');
         $this->headers = $headers;
         $this->conf = $conf;

@@ -15,6 +15,22 @@ $settings = get_option('forms_handler_settings', []);
             <tbody>
                 <tr>
                     <th scope="row">
+                        <label for="default_email">
+                            <?php _e('Default e-mail') ?>
+                        </label>
+                    </th>
+                    <td>
+                        <input 
+                            name="settings[default_email]" 
+                            type="text" 
+                            id="default_email"
+                            value="<?php echo $settings['default_email'] ?? '' ?>" 
+                            class="regular-text">
+                    </td>
+                </tr>
+
+                <tr>
+                    <th scope="row">
                         <label for="enable_recaptcha">
                             <?php _e('Enable reCAPTCHA') ?>
                         </label>
