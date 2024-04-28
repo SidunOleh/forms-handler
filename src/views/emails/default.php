@@ -1,7 +1,7 @@
 <table role="presentation" style="width:602px;border-collapse:collapse;border:1px solid #cccccc;border-spacing:0;text-align:left;">
 
 <?php 
-foreach ($data as $name => $value): 
+foreach ($this->data as $name => $value): 
 
 $name = explode('_', $name);
 $name[0] = ucfirst($name[0]);

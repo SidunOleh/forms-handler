@@ -2,17 +2,15 @@
 
 namespace FormsHandler;
 
-use Exception;
-
 defined('ABSPATH') or die;
+
+use Rakit\Validation\Validator;
 
 class Handler
 {
-    private static array $rules = [];
-
     private string $action;
 
-    private array $fields;
+    private array $rules;
 
     private string $to;
 
@@ -24,14 +22,15 @@ class Handler
 
     public function __construct( 
         string $action, 
-        array $fields, 
+        array $rules, 
         string $to = '', 
         string $subject = '',
         array $headers = [], 
         array $conf = []
-    ) {
+    ) 
+    {
         $this->action = $action;
-        $this->fields = $fields;
+        $this->rules = $rules;
         $this->to = $to ?: get_option('admin_email');
         $this->subject = $subject ?: get_bloginfo('name');
         $this->headers = $headers;
@@ -47,109 +46,100 @@ class Handler
 
     public function handle(): never
     {
-        $validated = $this->validate($this->getInput());
-
-        if ($validated === false) {
+        $validator = new Validator;
+        $validation = $validator->make($_POST + $_FILES, $this->rules);
+        $validation->validate();
+        
+        if ($validation->fails()) {
             $this->response(false);
         }
+
+        if (
+            get_forms_settings('enable_recaptcha') and
+            ! $this->checkRecaptcha()
+        ) {
+            $this->response(false);
+        }
+
+        $validated = $validation->getValidData();
+
+        $this->uploadFiles($validated);
 
         do_action('forms_handlers_before_send', $this->action, $validated, $this->conf);
 
         $sent = $this->send($validated);
+
+        if ($this->conf['persist'] ?? false) {
+            FormsData::save($this->action, $sent, $validated);
+        }
 
         do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
 
         $this->response($sent);
     }
 
-    private function getInput(): array
+    private function checkRecaptcha(): bool
     {
-        $input = [];
-        foreach ($_POST as $name => $value) {
-            if ($value === '') {
-                continue;
-            } 
-
-            if ($value === []) {
-                continue;
-            }
-
-            $input[$name] = $value;
+        $recaptcha = new Recaptcha(
+            get_forms_settings('recaptcha_site_key'),
+            get_forms_settings('recaptcha_secret_key')
+        );
+    
+        $code = $_POST['recaptcha_response'] ?? null;
+        if (
+            ! $code or 
+            ! $recaptcha->verify($code)
+        ) {
+            return false;
         }
 
-        return $input;
+        return true;
     }
 
-    private function validate(array $data): array|false
+    private function uploadFiles(array &$data)
     {
-        $validated = [];
-        foreach ($this->fields as $field => $rules) {
-            if (
-                ! in_array('required', $rules) and 
-                ! isset($data[$field])
-            ) {
-                continue;
+        foreach ($data as &$item) {
+            if (isset($item['tmp_name'])) {
+                $item = $this->upload($item);
             }
 
-            foreach ($rules as $rule) {
-                if (! isset(self::$rules[$rule])) {
-                    throw new Exception("Rule {$rule} not found.");
-                }
-
-                if (self::$rules[$rule]($field, $data)) {
-                    $validated[$field] = $data[$field];
-                } else {
-                    return false;
-                }
+            if (is_array($item)) {
+                $this->uploadFiles($item);
             }
         }
+    }
 
-        return $validated;
+    private function upload(array $file): string|false
+    {
+        if ($file['error']) {
+            return false;
+        }
+
+        $uploaded = wp_handle_upload($file, ['test_form' => false,]);
+
+        if (isset($uploaded['error'])) {
+            return false;
+        }
+
+        return $uploaded['file'];
     }
 
     private function send(array $data): bool
     {
-        $msg = $this->msg($data);
-
-        if (isset($data['email'])) {
-            $this->headers[] = "Reply-To: {$data['email']} <{$data['email']}>";
-        }
-
-        return wp_mail($this->to, $this->subject, $msg, $this->headers);
-    }
-
-    private function msg(array $data)
-    {
-        $template = apply_filters(
+        $msgTemplate = apply_filters(
             'forms_handlers_email_template', 
             FORMS_HANDLER_ROOT . '/src/views/emails/default.php',
             $this->action
         );
 
-        $msg = $this->readTemplate($template, $data);
+        $msg = new Message($data, $msgTemplate);
 
-        return $msg;
-    }
-
-    private function readTemplate(string $template, array $data = []): string
-    {
-        ob_start();
-
-        require $template;
-        
-        $msg = ob_get_clean();
-
-        return $msg;
+        return $msg->send($this->to, $this->subject, $this->headers);
     }
 
     private function response(bool $status): never
     {
         wp_send_json(['status' => $status,]);
         wp_die();
-    }
-
-    public static function addRule(string $name, callable $fn): void
-    {
-        self::$rules[$name] = $fn;
     }
 }

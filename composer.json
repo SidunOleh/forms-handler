@@ -10,5 +10,7 @@
         "name": "Oleh Sidun",
         "email": "sidunoleh@gmail.com"
     }],
-    "require": {}
+    "require": {
+        "rakit/validation": "^1.4"
+    }
 }

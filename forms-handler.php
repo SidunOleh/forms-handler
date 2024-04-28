@@ -7,8 +7,6 @@
  */
 
 use FormsHandler\FormsData;
-use FormsHandler\Handler;
-use FormsHandler\Recaptcha;
 use function FormsHandler\get_forms_settings;
 
 defined('ABSPATH') or die;
@@ -22,33 +20,6 @@ const FORMS_HANDLER_ROOT = __DIR__;
  * Composer autoloader
  */
 require_once FORMS_HANDLER_ROOT . '/vendor/autoload.php';
-
-/**
- * Built-in rules
- */
-Handler::addRule('required', function (string $field, array $data) {
-    return isset($data[$field]);
-});
-
-Handler::addRule('string', function (string $field, array $data) {
-    return is_string($data[$field]);
-});
-
-Handler::addRule('number', function (string $field, array $data) {
-    return is_numeric($data[$field]);
-});
-
-Handler::addRule('email', function (string $field, array $data) {
-    return filter_var($data[$field], FILTER_VALIDATE_EMAIL);
-});
-
-Handler::addRule('us-phone', function (string $field, array $data) {
-    return preg_match('/^\(\d{3}\) \d{3}\-\d{4}$/', $data[$field]);
-});
-
-Handler::addRule('array', function (string $field, array $data) {
-    return is_array($data[$field]);
-});
 
 /**
  * Create forms data table
@@ -86,7 +57,7 @@ add_action('wp_head', function () {
     </script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
-        grecaptcha.ready(sendRecaptcha)
+        grecaptcha.ready(validateCaptcha)
 
         const inputs = document.querySelectorAll('input')
         inputs.forEach(input => {
@@ -98,7 +69,7 @@ add_action('wp_head', function () {
         })
     })
 
-    function sendRecaptcha() {
+    function validateCaptcha() {
         grecaptcha.execute('<?php echo $siteKey ?>', {
             action:'validate_captcha',
         }).then(token => {
@@ -122,45 +93,6 @@ add_action('wp_head', function () {
     </style>
     <?php 
 });
-
-/**
- * Check reCAPTCHA
- */
-add_action('forms_handlers_before_send', function () {
-    if (! get_forms_settings('enable_recaptcha')) {
-        return;
-    }
-
-    $recaptcha = new Recaptcha(
-        get_forms_settings('recaptcha_site_key'),
-        get_forms_settings('recaptcha_secret_key')
-    );
-
-    $code = $_POST['recaptcha_response'] ?? null;
-    if (
-        ! $code or 
-        ! $recaptcha->verify($code)
-    ) {
-        wp_send_json(['status' => false,]);
-        wp_die();
-    }
-}, 10);
-
-/**
- * Save form data to db
- */
-add_action('forms_handlers_after_send', function (
-    string $action,
-    bool $sent,  
-    array $validated,
-    array $conf
-) {
-    if (! $conf['persist'] ?? false) {
-        return;
-    }
-
-    FormsData::save($action, $sent, $validated);
-}, 10, 4);
 
 /**
  * Add menu page
