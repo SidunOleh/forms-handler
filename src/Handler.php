@@ -54,6 +54,8 @@ class Handler
             $this->response(false);
         }
 
+        $validated = $validation->getValidData();
+
         if (
             get_forms_settings('enable_recaptcha') and
             ! $this->checkRecaptcha()
@@ -61,18 +63,16 @@ class Handler
             $this->response(false);
         }
 
-        $validated = $validation->getValidData();
-
         $this->uploadFiles($validated);
 
-        do_action('forms_handlers_before_send', $this->action, $validated, $this->conf);
+        do_action('forms_handlers_before_send', $this->action, $validated);
 
         $sent = $this->send($validated);
 
-        do_action('forms_handlers_after_send', $this->action, $sent, $validated, $this->conf);
+        do_action('forms_handlers_after_send', $this->action, $validated, $sent);
 
         if ($this->conf['persist'] ?? false) {
-            FormsData::save($this->action, $sent, $validated);
+            FormsData::save($this->action, $validated, $sent);
         }
 
         $this->response($sent);
@@ -126,19 +126,19 @@ class Handler
 
     private function send(array $data): bool
     {
-        $msgTemplate = apply_filters(
+        $emailTemplate = apply_filters(
             'forms_handlers_email_template', 
             FORMS_HANDLER_ROOT . '/src/views/emails/default.php',
             $this->action
         );
 
-        $msg = new Message($data, $msgTemplate);
+        $msg = new Message($data, $emailTemplate);
 
         if (isset($data['email'])) {
-            $this->headers[] = "Reply-To: {$data['email']} <{$data['email']}>";
+           $headers = $this->headers + ["Reply-To: {$data['email']} <{$data['email']}>"];
         }
 
-        return $msg->send($this->to, $this->subject, $this->headers);
+        return $msg->send($this->to, $this->subject, $headers);
     }
 
     private function response(bool $status): never

@@ -47,16 +47,16 @@ register_activation_hook(__FILE__, function () {
  * Add forms_edit capability and forms_editor role
  */
 register_activation_hook(__FILE__, function () {
-    if ($formsEditor = add_role('forms_editor', __('Forms editor'))) {
-        $formsEditor->add_cap('forms_edit');
+    if ($formsEditor = add_role('forms_manager', __('Forms manager'))) {
+        $formsEditor->add_cap('forms_manage');
         $formsEditor->add_cap('read');
     }
 
     if (
         $admin = get_role('administrator') and 
-        ! $admin->has_cap('forms_editor')
+        ! $admin->has_cap('forms_manage')
     ) {
-        $admin->add_cap('forms_edit');
+        $admin->add_cap('forms_manage');
     }
 });
 
@@ -76,7 +76,7 @@ add_action('wp_head', function () {
     document.addEventListener('DOMContentLoaded', () => {
         grecaptcha.ready(validateCaptcha)
 
-        const inputs = document.querySelectorAll('input')
+        const inputs = document.querySelectorAll('form.recaptcha input')
         inputs.forEach(input => {
             input.addEventListener('focus', () => {
                 document.querySelector('.grecaptcha-badge')
@@ -90,14 +90,25 @@ add_action('wp_head', function () {
         grecaptcha.execute('<?php echo $siteKey ?>', {
             action:'validate_captcha',
         }).then(token => {
-            const recaptchaInput = document.createElement('input')
-            recaptchaInput.type = 'hidden'
-            recaptchaInput.name = 'recaptcha_response'
-            recaptchaInput.value = token
-
-            const forms = document.querySelectorAll('form')
-            forms.forEach(form => form.appendChild(recaptchaInput.cloneNode()))
+            const forms = document.querySelectorAll('form.recaptcha')
+            forms.forEach(form => {
+                const recaptchaInput = form.querySelector('[name=recaptcha_response]')
+                if (recaptchaInput) {
+                    recaptchaInput.value = token
+                } else {
+                    form.appendChild(createRecaptchaInput(token))
+                }
+            })
         }).catch(err => console.log(err))
+    }
+
+    function createRecaptchaInput(token) {
+        const recaptchaInput = document.createElement('input')
+        recaptchaInput.type = 'hidden'
+        recaptchaInput.name = 'recaptcha_response'
+        recaptchaInput.value = token
+
+        return recaptchaInput
     }
     </script>
 
@@ -118,7 +129,7 @@ add_action('admin_menu', function () {
     add_menu_page(
         __('Forms'),
         __('Forms'),
-        'forms_edit',
+        'forms_manage',
         'forms',
         fn () => require FORMS_HANDLER_ROOT . '/src/views/pages/index.php',
         'dashicons-forms',
@@ -146,7 +157,7 @@ add_action('admin_menu', function () {
 add_action('wp_ajax_get_forms_data', function () {
     if (
         ! $user = wp_get_current_user() or 
-        ! $user->has_cap('forms_edit')
+        ! $user->has_cap('forms_manage')
     ) {
         wp_send_json(['message' => 'Forbidden',], 403);
         wp_die();
@@ -169,7 +180,7 @@ add_action('wp_ajax_get_forms_data', function () {
 add_action('wp_ajax_delete_forms_data', function () {
     if (
         ! $user = wp_get_current_user() or 
-        ! $user->has_cap('forms_edit')
+        ! $user->has_cap('forms_manage')
     ) {
         wp_send_json(['message' => 'Forbidden',], 403);
         wp_die();

@@ -8,8 +8,8 @@ class FormsData
 {
     public static function save(
         string $form, 
-        bool $status, 
-        array $data
+        array $data,
+        bool $status
     ): int|false
     {
         global $wpdb;
