@@ -21,13 +21,18 @@ const table = new Tabulator('#forms-data', {
             field: 'name',
         },
         {
+            title: 'Phone', 
+            field: 'phone',
+        },
+        {
             title: 'E-mail', 
             field: 'email',
         },
         {
-            title: 'Description', 
-            field: 'description',
+            title: 'Message', 
+            field: 'message',
             formatter: 'textarea',
+            width: 500,
         },
         {
             title: 'Form', 
@@ -40,7 +45,6 @@ const table = new Tabulator('#forms-data', {
             formatter: 'tickCross',
             width: 80,
             hozAlign: 'center',
-            vertAlign: 'middle',
         },
         {
             title: 'Created at', 
@@ -52,7 +56,6 @@ const table = new Tabulator('#forms-data', {
                 return '<span title="Delete">🗑️</span>'
             }, 
             hozAlign: 'center',
-            vertAlign: 'middle',
             width: 30,
             cellClick(e, cell) {
                 if (! confirm('Are you sure to delete?')) {
